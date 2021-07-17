@@ -1,17 +1,14 @@
-importScripts(
-    "https://storage.googleapis.com/workbox-cdn/releases/6.1.5/workbox-sw.js"
-  );
-  // https://thecalicoder.github.io/
-  // Network First
-  [
-    "/$", // Index
-    "/*", // Anything in the same host
-    "/.+/*", // Anything in any host
-  ].forEach((mask) => {
-    workbox.routing.registerRoute(
-      new RegExp(mask),
-      new workbox.strategies.NetworkFirst({
-        cacheName: "dynamic",
-      })
+const version = "v1",
+  index = "/offline.html";
+this.addEventListener("install", (e) => {
+  this.skipWaiting(),
+    e.waitUntil(caches.open(version).then((e) => e.addAll([index])));
+}),
+  this.addEventListener("fetch", (t) => {
+    t.respondWith(
+      caches
+        .match(t.request)
+        .then((e) => e || fetch(t.request))
+        .catch(() => caches.match(index))
     );
   });
